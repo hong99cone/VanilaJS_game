@@ -42,7 +42,7 @@ function painItem() {
 
 function timer() {
     let timeText = document.querySelector('.time span');
-    let timeOut = 100;
+    let timeOut = 10;
     let timer = setInterval(function () {
             
         // time 다 됐을시 게임오버되는 효과
@@ -139,10 +139,9 @@ function controlPlay(e) {
         }
     })
 
-    // 팝업창 띄움
+    // 팝업창 띄움 -> 안됨
     if (e.target === pauseBtn) {
      // tiem 멈추기 어떻게 해야함 ㅠ_ㅠ?
-     console.log('hey')
         timeStop(); }
 }
 
