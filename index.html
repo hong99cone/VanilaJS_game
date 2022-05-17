@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="main.js"></script>
+    <title>Where Is My Money?</title>
+</head>
+<body>
+    <div class="container">
+        <div class="item__container">
+            <button class="btn__start-stop start">
+                start
+            </button>
+            <div class="time">
+                <span>00:00</span>
+            </div>
+            <div class="item__left-money">
+                <span>0</span>
+            </div>
+        </div>
+
+        <div id="game-zone" class="contents__game-zone">
+        </div>
+
+
+    </div>
+
+    <div class="container__popup">
+        <div class="popup hidden">
+            <p class="result">You're Lost!</p>
+            <button class="btn__replay">
+                <span>replay</span>
+            </button>
+        </div>
+    </div>
+    
+    <audio src="carrot/sound/game_win.mp3" id="win"></audio>
+    <audio src="carrot/sound/bug_pull.mp3" id="bug"></audio>
+    <audio src="carrot/sound/carrot_pull.mp3" id="money"></audio>
+    <audio src="carrot/sound/alert.wav" id="lost"></audio>
+    <audio src="carrot/sound/Hiphop.mp3" id="bgm"></audio>
+</body>
+</html>
