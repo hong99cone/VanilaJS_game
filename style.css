@@ -1,5 +1,4 @@
 @charset 'utf-8';
-
 * {
     font-size: 60.;
     margin: 0;
@@ -41,7 +40,6 @@ button:hover {
     padding: 1.5rem 0 0;
 }
 
-
 .btn__start-stop {
     padding: .3rem .5rem;
     /* border-radius: .5rem; */
@@ -53,8 +51,8 @@ button:hover {
     transition: all .3s ease-in;
 }
 
-
 .time {
+    opacity: 0;
     margin: 1.3rem 0;
 }
 
@@ -64,11 +62,9 @@ button:hover {
     /* border-radius: .5rem; */
 }
 
-
-.item__left-money span{
+.item__left-money span {
+    opacity: 0;
     padding: .3rem .8rem;
-    /* border-radius: 50%; */
-    /* outline: .3rem solid rgb(178, 32, 32); */
     color: white;
     background-color: rgba(187, 0, 0, 0.582);
 }
@@ -117,7 +113,6 @@ button:hover {
     font-size: 2rem;
     color: white;
 }
-
 
 .popup button {
     margin: .5rem 0 0;

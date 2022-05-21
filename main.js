@@ -1,59 +1,146 @@
 'use strict';
 
 
-const playBtn = document.querySelector('.btn__start-stop.start');
-const audioBg = document.querySelector('#bgm');
-const audioAlert = document.querySelector('#lost');
-const audioWin = document.querySelector('#win')
+const ITEM_COUNT = 12;
+const ITEM_WIDTH = 100;
+
+const playBtn = document.querySelector('.btn__start-stop');
 const replayBtn = document.querySelector('.btn__replay');
+
+const gameTimer = document.querySelector('.time');
+const gameScore = document.querySelector('.item__left-money span');
 const gameZone = document.querySelector('#game-zone');
+const gameZoneArea = gameZone.getBoundingClientRect();
+
+const popup = document.querySelector('.popup')
+const popupBg = document.querySelector('.container__popup');
+const popupTxt = document.querySelector('p.result');
+
+const audioBg = new Audio('carrot/sound/Hiphop.mp3');
+const audioClick = new Audio('carrot/sound/carrot_pull.mp3');
+const audioBug = new Audio('carrot/sound/bug_pull.mp3');
+const audioWin = new Audio('carrot/sound/game_win.mp3');
+const audioLose = new Audio('carrot/sound/alert.wav');
+
+let started = false;
+let score = 0;
+let timer;
+
+playBtn.addEventListener('click', () => {
+    // function뒤에 () 안붙여서 작동이 안됐었음
+    started ? stopGame() : startGame();
+})
+
+gameZone.addEventListener('click', clickItem)
+
+replayBtn.addEventListener('click', () => {
+    startGame();
+    popupClose();
+    showGameBtn();
+})
 
 
-function painItem() {
-    const width = gameZone.getBoundingClientRect().width * 0.85;
-    const height = gameZone.getBoundingClientRect().height * 0.7;
-
-    // money 그리기
-    for (let i = 0 ; i < 12 ; i ++) {
-        const randomX = Math.floor(Math.random() * width);
-        const randomY = Math.floor(Math.floor(Math.random() * height));
-        const money = document.createElement('img');
-        money.setAttribute("class", "money");
-        money.setAttribute("src", "carrot/img/dollar.png");
-        money.style.transform = `translate(${randomX}px,${randomY}px)`
-        gameZone.append(money);
-    }
-
-    // bug 그리기
-    for (let i = 0 ; i < 12 ; i ++) {
-        const randomX = Math.floor(Math.random() * width);
-        const randomY = Math.floor(Math.floor(Math.random() * height));
-
-        const bug = document.createElement('img');
-        bug.setAttribute("class", "bug");
-        bug.setAttribute("src", "carrot/img/gun.png");
-        bug.style.transform = `translate(${randomX}px,${randomY}px)`
-
-        gameZone.append(bug);
-
-    }
-
+function startGame() {
+    started = true;
+    score = 0;
+    delItem();
+    playSound(audioBg);
+    startToPause();
+    timeStart();
+    showTimerAndScore();
+    paintItem('dollar', 'carrot/img/dollar.png', ITEM_COUNT);
+    paintItem('gun', 'carrot/img/gun.png', ITEM_COUNT);
 }
 
-function timer() {
+function stopGame() {
+    started = false;
+    timeStop();
+    hideGameBtn();
+    popupOpen();
+    popupText('Replay? 🤷‍♂️')
+    stopSound(audioBg);
+    playSound(audioBug);
+}
+
+function finishGame(win) {
+    timeStop();
+    hideGameBtn();
+    popupOpen();
+    popupText(win ? "You're Winner 🏆" : "you're LoSer 🤯")
+        (win ? playSound(audioWin) : playSound(audioLose))
+}
+
+function startToPause() {
+    playBtn.innerText = 'pause';
+    playBtn.style.background = 'rgb(68, 1, 1)'
+    playBtn.classList.add('active');
+    playBtn.classList.remove('start');
+}
+
+function showGameBtn() {
+    playBtn.style.opacity = 1;
+}
+
+
+function hideGameBtn() {
+    playBtn.style.opacity = 0;
+}
+
+function paintItem(name, src, count) {
+    const width = gameZoneArea.width - ITEM_WIDTH;
+    const height = gameZoneArea.height - ITEM_WIDTH;
+
+    for (let i = 0; i < count; i++) {
+        const randomX = randomNum(0, width);
+        const randomY = randomNum(0, height);
+
+        const item = document.createElement('img');
+        item.setAttribute("class", name);
+        item.setAttribute("src", src);
+        item.style.position = 'absolute';
+        item.style.transform = `translate(${randomX}px,${randomY}px)`
+        gameZone.append(item);
+    }
+}
+
+function randomNum(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function clickItem(e) {
+    let target = e.target;
+    if (target.matches('.dollar')) {
+        playSound(audioClick);
+        target.remove();
+        score++;
+        updateScore();
+        if (score === ITEM_COUNT) {
+            finishGame(true);
+        }
+    } else if (target.matches('.gun')) {
+        playSound(audioBug);
+        timeStop();
+        finishGame(false);
+    }
+}
+
+function updateScore() {
+    gameScore.innerText = ITEM_COUNT - score;
+}
+
+function timeStart() {
     let timeText = document.querySelector('.time span');
     let timeOut = 10;
-    let timer = setInterval(function () {
-            
-        // time 다 됐을시 게임오버되는 효과
-        if (timeOut === 0) {
-            audioAlert.play();
-            popupOpen();
-            timeStop();
-            return  false;
-        }
-        timeOut -= 1;
-        timeText.innerText = `00:${timeOut < 10 ? `0${timeOut}` : timeOut}`;
+    timer = setInterval(function() {
+                // time 다 됐을시 게임오버되는 효과
+                if (timeOut <= 0) {
+                    popupOpen();
+                    playSound(audioLose);
+                    timeStop();
+                    return;
+                }
+                timeOut -= 1;
+                timeText.innerText = `00:${timeOut < 10 ? `0${timeOut}` : timeOut}`;
     }, 1000)
 }
 
@@ -61,88 +148,36 @@ const timeStop = () => {
     clearInterval(timer)
 }
 
+function showTimerAndScore() {
+    gameTimer.style.opacity = 1;
+    gameScore.style.opacity = 1;
+}
+
+
 function delItem() {
     const item = document.querySelectorAll('#game-zone img');
     item.forEach((ele) => ele.remove());
 }
 
 function popupClose() {
-    const popup = document.querySelector('.popup')
-    const popupBg = document.querySelector('.container__popup');
     popupBg.classList.remove('show');
     popup.classList.add('hidden');
 }
 
 function popupOpen() {
-    const popup = document.querySelector('.popup')
-    const popupBg = document.querySelector('.container__popup');
-
     popup.classList.remove('hidden');
     popupBg.classList.add('show');
-    audioBg.pause();
-
-    // replay game
-    replayBtn.addEventListener('click', () => {
-        popupClose();
-
-        // game 다시시작
-        timer();
-        delItem();
-        painItem();
-        audioBg.play();
-    } )
 }
 
-
-function controlPlay(e) {
-    const pauseBtn = document.querySelector('.btn__start-stop.active');
-
-    //when click play btn, change text, bg
-    playBtn.innerText = 'pause';
-    playBtn.style.background = 'rgb(68, 1, 1)'
-    playBtn.classList.add('active');
-    playBtn.classList.remove('start');
-    audioBg.play();
-
-    // timer
-    timer();
-    // paint item
-    painItem();
-
-    // 남은돈 다털어서 나오면 포켓몬빵 하나씩
-    const leftItemTxt = document.querySelector('.item__left-money span')
-    let moneyLeft = gameZone.querySelectorAll('.money').length;
-    leftItemTxt.innerText = `${moneyLeft}`
-
-    // item click
-    gameZone.addEventListener('click', (e) => {
-        const audioMoney = document.querySelector('audio#money');
-        const audioBug = document.querySelector('audio#bug');
-
-        if(e.target.className === 'money') {
-            e.target.remove();
-            audioMoney.play();
-            moneyLeft -= 1;
-            leftItemTxt.innerText = `${moneyLeft}`
-            if (moneyLeft === 0 ) {
-                audioWin.play();
-                popupOpen();
-                let result = document.querySelector('.result');
-                result.innerText = "You're Win!!!"
-            }
-            
-        }
-        if (e.target.className === 'bug') {
-            audioBug.play();
-            audioAlert.play();
-            popupOpen();
-        }
-    })
-
-    // 팝업창 띄움 -> 안됨
-    if (e.target === pauseBtn) {
-     // tiem 멈추기 어떻게 해야함 ㅠ_ㅠ?
-        timeStop(); }
+function popupText(text) {
+    popupTxt.innerText = text;
 }
 
-playBtn.addEventListener('click', (e) => controlPlay(e))
+function playSound(audio) {
+    audioBg.currentTime = 0;
+    audio.play();
+}
+
+function stopSound(audio) {
+    audio.pause();
+}
