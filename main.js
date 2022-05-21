@@ -67,7 +67,7 @@ function finishGame(win) {
     hideGameBtn();
     popupOpen();
     popupText(win ? "You're Winner 🏆" : "you're LoSer 🤯")
-        (win ? playSound(audioWin) : playSound(audioLose))
+    win ? audioWin.play() : audioLose.play();
 }
 
 function startToPause() {
@@ -108,9 +108,11 @@ function randomNum(min, max) {
 }
 
 function clickItem(e) {
+    if (!started) return;
+
     let target = e.target;
     if (target.matches('.dollar')) {
-        playSound(audioClick);
+        audioClick.play();
         target.remove();
         score++;
         updateScore();
@@ -118,7 +120,7 @@ function clickItem(e) {
             finishGame(true);
         }
     } else if (target.matches('.gun')) {
-        playSound(audioBug);
+        audioBug.play();
         timeStop();
         finishGame(false);
     }
