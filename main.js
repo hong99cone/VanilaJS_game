@@ -66,7 +66,7 @@ function finishGame(win) {
     timeStop();
     hideGameBtn();
     popupOpen();
-    popupText(win ? "You're Winner 🏆" : "you're LoSer 🤯")
+    popupText(win ? "You're Winner 🏆" : "you're LoSer 🤯");
     win ? audioWin.play() : audioLose.play();
 }
 
